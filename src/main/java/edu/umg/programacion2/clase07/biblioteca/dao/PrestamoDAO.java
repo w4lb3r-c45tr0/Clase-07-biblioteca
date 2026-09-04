@@ -24,17 +24,14 @@ import java.util.List;
  */
 public class PrestamoDAO {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/prog2_db?useSSL=false&serverTimezone=UTC";
-    private static final String USUARIO = "root";
-    private static final String PASSWORD = "tu_contraseña";
 
     // Repaso: INSERT con generated keys, igual que EstudianteDAO.crear().
     public int registrarPrestamo(Prestamo prestamo) throws SQLException {
         String sql = "INSERT INTO prestamos (libro_id, nombre_estudiante, fecha_prestamo, fecha_devolucion) "
                 + "VALUES (?, ?, ?, ?)";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-             PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conexion = ConexionDB.getConexion();
+        	     PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setInt(1, prestamo.getLibroId());
             statement.setString(2, prestamo.getNombreEstudiante());
@@ -55,8 +52,8 @@ public class PrestamoDAO {
     public boolean marcarDevuelto(int prestamoId, LocalDate fechaDevolucion) throws SQLException {
         String sql = "UPDATE prestamos SET fecha_devolucion = ? WHERE id = ? AND fecha_devolucion IS NULL";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-             PreparedStatement statement = conexion.prepareStatement(sql)) {
+        try (Connection conexion = ConexionDB.getConexion();
+        	     PreparedStatement statement = conexion.prepareStatement(sql)) {
 
             statement.setDate(1, Date.valueOf(fechaDevolucion));
             statement.setInt(2, prestamoId);

@@ -20,15 +20,12 @@ import java.util.Optional;
  */
 public class LibroDAO {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/prog2_db?useSSL=false&serverTimezone=UTC";
-    private static final String USUARIO = "root";
-    private static final String PASSWORD = "tu_contraseña";
-
+ 
     public int crear(Libro libro) throws SQLException {
         String sql = "INSERT INTO libros (titulo, autor, isbn) VALUES (?, ?, ?)";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-             PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conexion = ConexionDB.getConexion();
+        	     PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, libro.getTitulo());
             statement.setString(2, libro.getAutor());
@@ -48,9 +45,9 @@ public class LibroDAO {
         String sql = "SELECT id, titulo, autor, isbn FROM libros ORDER BY id";
         List<Libro> libros = new ArrayList<>();
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-             PreparedStatement statement = conexion.prepareStatement(sql);
-             ResultSet resultado = statement.executeQuery()) {
+        try (Connection conexion = ConexionDB.getConexion();
+        	     PreparedStatement statement = conexion.prepareStatement(sql);
+        	     ResultSet resultado = statement.executeQuery()) {
 
             while (resultado.next()) {
                 libros.add(mapearFila(resultado));
@@ -62,9 +59,9 @@ public class LibroDAO {
     public Optional<Libro> buscarPorIsbn(String isbn) throws SQLException {
         String sql = "SELECT id, titulo, autor, isbn FROM libros WHERE isbn = ?";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-             PreparedStatement statement = conexion.prepareStatement(sql)) {
-
+        try (Connection conexion = ConexionDB.getConexion();
+        	     PreparedStatement statement = conexion.prepareStatement(sql)) {
+        	
             statement.setString(1, isbn);
 
             try (ResultSet resultado = statement.executeQuery()) {
