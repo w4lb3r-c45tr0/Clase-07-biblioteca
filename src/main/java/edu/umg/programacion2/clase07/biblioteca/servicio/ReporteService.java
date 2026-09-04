@@ -54,9 +54,24 @@ public class ReporteService {
      * de "sin prestamo activo", y ajusta la consulta si hace falta.
      */
     public Set<Libro> librosNuncaPrestados() throws SQLException {
-        Set<Libro> resultado = new HashSet<>();
-        // TODO: usar libroDAO y prestamoDAO para llenar "resultado" segun las pistas de arriba.
+    	Set<Libro> resultado = new HashSet<>();
+        
+        // Obtener todos los libros y préstamos activos de los DAO
+        List<Libro> todosLosLibros = libroDAO.listarTodos();
+        List<PrestamoDetalle> prestamosActivos = prestamoDAO.listarPrestamosActivosConLibro();
 
+        // Guardar los títulos prestados en un Set para búsquedas rápidas
+        Set<String> titulosPrestados = new HashSet<>();
+        for (PrestamoDetalle prestamo : prestamosActivos) {
+            titulosPrestados.add(prestamo.getTituloLibro());
+        }
+
+        // Filtrar libros cuyo título NO esté en el Set de prestados
+        for (Libro libro : todosLosLibros) {
+            if (!titulosPrestados.contains(libro.getTitulo())) {
+                resultado.add(libro);
+            }
+        }
         return resultado;
     }
 
